@@ -66,8 +66,8 @@ export function updateVomit(dt) {
   }
 }
 
-/** Vomir vide l'estomac (pas le sang). `auto` : déclenché par le corps au-delà de 2 g/L. */
-export function startVomit(auto) {
+/** Vomir vide l'estomac (pas le sang). Déclenché en touchant le perso. */
+export function startVomit() {
   const before = projection.peak, blood = sim.blood;
   const entry = { kind: 'vomit', label: 'Vomi' };
   remember(entry); pushHistory(entry);
@@ -77,11 +77,10 @@ export function startVomit(auto) {
   setState('vomit');
   ch.vomitAmount = res.expelled; ch.vomitEmit = 0; ch.vomitCD = 8;
   if (res.expelled > 0.3) { ch.puddle = entry.puddle = newPuddle(); ch.vomitMat = ch.puddle.mat; }
-  const pre = auto ? `Au-delà de 2 g/L, le corps rejette l'alcool tout seul. ` : '';
   if (res.expelled >= 1.5) {
-    showHint(`${pre}Vomir a évacué ${res.expelled.toFixed(0)} g d'alcool encore dans l'estomac : pic prévu ${fmtG(before)} → ${fmtG(projection.peak)} g/L. Mais les ${fmtG(blood)} g/L déjà dans le sang restent.`, 6500);
+    showHint(`Vomir a évacué ${res.expelled.toFixed(0)} g d'alcool encore dans l'estomac : pic prévu ${fmtG(before)} → ${fmtG(projection.peak)} g/L. Mais les ${fmtG(blood)} g/L déjà dans le sang restent.`, 6500);
   } else {
-    showHint(`${pre}Estomac (presque) vide : vomir ne sert plus à rien, l'alcool est déjà dans le sang (${fmtG(blood)} g/L). Seul le temps l'élimine.`, 6000);
+    showHint(`Estomac (presque) vide : vomir ne sert plus à rien, l'alcool est déjà dans le sang (${fmtG(blood)} g/L). Seul le temps l'élimine.`, 6000);
   }
 }
 

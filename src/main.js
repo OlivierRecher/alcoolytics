@@ -12,7 +12,7 @@ import { createCharacter, updateCharacter } from './game/character/character.js'
 import { updateFlying, updateBottles } from './game/drinks/bottles.js';
 import { updateVomit } from './game/vomit.js';
 import { createCar, updateCar } from './game/car.js';
-import { createStars, createKoRing, updateFx, updateStars, updateKoRing } from './game/effects.js';
+import { createStars, createKoRing, createNauseaCue, updateFx, updateStars, updateKoRing, updateNauseaCue } from './game/effects.js';
 import { createDog, updateDog } from './game/dog.js';
 import { updateBirds } from './game/birds.js';
 import { initPointer, updatePointer } from './input/pointer.js';
@@ -38,6 +38,7 @@ createCharacter();
 createCar();
 createStars();
 createKoRing();
+createNauseaCue();
 createDog();
 
 // ---------- Entrées, interface ----------
@@ -74,6 +75,7 @@ renderer.setAnimationLoop(() => {
   updateFx(dt);
   updateStars(dt);
   updateKoRing();
+  updateNauseaCue();
   updateUI();
   controls.update();
   renderer.render(scene, camera);

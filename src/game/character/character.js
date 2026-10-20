@@ -10,7 +10,7 @@ import { buildRig, disposeRig } from './rig.js';
 import { POSE, applyPose, faceLook, behaviour } from './animation.js';
 import { car, carDoor, startDrive, setDriverLook } from '../car.js';
 import { stars } from '../effects.js';
-import { startVomit, emitVomit } from '../vomit.js';
+import { emitVomit } from '../vomit.js';
 import { startDrink } from '../drinks/drinking.js';
 import { throwGlass } from '../drinks/bottles.js';
 import { updateUndo } from '../history.js';
@@ -22,7 +22,7 @@ import { updateUndo } from '../history.js';
 export const ch = {
   sex: 'male', rig: null, pos: HOME.clone(), heading: 0.68, state: 'idle', t: 0,
   moving: 0, walkPhase: 0, spin: 0, wander: HOME.clone(), wanderT: 0,
-  vomitCD: 2, vomitAmount: 0, vomitEmit: 0, vomitMat: null, blinkT: 2, queue: [], glass: null, drink: null,
+  vomitCD: 2, vomitAmount: 0, vomitEmit: 0, vomitMat: null, nausea: 0, nauseaTold: false, blinkT: 2, queue: [], glass: null, drink: null,
   pose: null, rate: 10,
   home: HOME.clone(), grab: HOME.clone(), runHeld: false,
 };
@@ -65,6 +65,18 @@ function wanderAround(dt, bac, w) {
   walkTo(ch.wander, dt, bac, 0.35 + 0.4 * w.stagger);
 }
 
+/** Prêt à vomir : au repos, au-delà du seuil de nausée et hors délai après un vomi. */
+export const nauseous = (bac) => ch.state === 'idle' && ch.rig.root.visible && bac >= THRESHOLDS.vomit && ch.vomitCD <= 0;
+
+// main sur le ventre, tête basse, haut-le-cœur réguliers (n : intensité 0..1)
+function nauseaPose(P, time, n) {
+  const heave = Math.pow(Math.max(0, Math.sin(time * 2.4)), 8);
+  P.sp += (0.12 + 0.3 * heave) * n; P.hx += (0.18 + 0.2 * heave) * n;
+  P.aLx -= 0.9 * n; P.aLz -= 0.55 * n;
+  P.sz += Math.sin(time * 1.6) * 0.06 * n;
+  P.eyes -= 0.2 * n; P.brow += 0.4 * heave * n;
+}
+
 export function setState(s) { ch.state = s; ch.t = 0; ch.rate = 10; }
 
 export const grabbable = () => ch.rig.root.visible && ['idle', 'toHome', 'dizzy', 'run'].includes(ch.state);
@@ -103,8 +115,15 @@ export function updateCharacter(dt, bac) {
       ch.spin += w.spin;
       wanderAround(dt, bac, w);
       faceCam = ch.moving === 0;
-      if (bac < THRESHOLDS.vomit) ch.vomitCD = Math.max(ch.vomitCD - dt, 1.5);
-      else if ((ch.vomitCD -= dt) <= 0) { startVomit(true); break; }
+      // au-delà de 2 g/L : nausées. Il ne vomit plus tout seul, c'est au joueur de le toucher.
+      if (bac < THRESHOLDS.vomit) { ch.vomitCD = Math.max(ch.vomitCD - dt, 1.5); ch.nauseaTold = false; }
+      else ch.vomitCD = Math.max(ch.vomitCD - dt, 0);
+      if (ch.nausea > 0.01) nauseaPose(P, time, ch.nausea);
+      if (nauseous(bac) && !ch.nauseaTold) {
+        ch.nauseaTold = true;
+        const p = pronoun(), le = p.il === 'il' ? 'le' : 'la';
+        showHint(`Au-delà de 2 g/L : nausées. Touche-${le} pour ${le} faire vomir — ça vide l'estomac, pas le sang.`, 5000);
+      }
       if (ch.queue.length) startDrink(ch.queue.shift());
       break;
     }
@@ -184,6 +203,8 @@ export function updateCharacter(dt, bac) {
       break;
     }
   }
+
+  ch.nausea += ((nauseous(bac) ? 1 : 0) - ch.nausea) * (1 - Math.exp(-dt * 4));
 
   // walking cycle
   if (ch.moving > 0) {

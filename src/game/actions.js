@@ -21,7 +21,7 @@ export function tapCharacter() {
   if (ch.state === 'ko' || ch.state === 'getup') return showHint(`Inconscient${p.e} : surtout pas faire vomir — risque d'étouffement. PLS et 15 / 112.`, 5000);
   if (ch.state === 'run') return;
   if (ch.state !== 'idle') return showHint(`Un instant…`, 1200);
-  startVomit(false);
+  startVomit();
 }
 
 /** Toucher la voiture : le perso va prendre le volant, ivre ou non. */
