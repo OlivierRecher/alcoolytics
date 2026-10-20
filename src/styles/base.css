@@ -1,0 +1,20 @@
+:root {
+  --bg: #ece9e4;
+  --ink: #2a2622;
+  --muted: #8a837a;
+  --panel: rgba(255, 255, 255, 0.78);
+  --line: rgba(42, 38, 34, 0.12);
+  --btn: #2b2420;
+  --btn-ink: #fff;
+  --ok: #3fb8a0;
+  --warn: #e0a33a;
+  --high: #e07a3a;
+  --bad: #d94a3a;
+  --coma: #8f1d2c;
+  --lvl: var(--ok);
+  --peak: var(--ok);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; overscroll-behavior: none; }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+button { font: inherit; color: inherit; }

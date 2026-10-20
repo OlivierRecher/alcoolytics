@@ -1,0 +1,10 @@
+.badge { position: fixed; top: calc(24px + env(safe-area-inset-top)); right: 284px; font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 5px 10px; display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--lvl); transition: background .3s; }
+.badge b { color: var(--ink); font-weight: 600; }
+
+.alert { position: fixed; left: 50%; top: calc(24px + env(safe-area-inset-top)); transform: translate(-50%, -12px); width: min(340px, calc(100% - 32px)); background: var(--coma); color: #fff; border-radius: 10px; padding: 12px 14px; font-size: 11px; line-height: 1.45; opacity: 0; pointer-events: none; transition: .3s; box-shadow: 0 10px 30px rgba(143,29,44,.3); }
+.alert.show { opacity: 1; transform: translate(-50%, 0); }
+.alert strong { display: block; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 20px; margin-bottom: 3px; }
+
+#hint { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(10px); width: max-content; max-width: min(420px, calc(100% - 32px)); background: var(--btn); color: #fff; font-size: 11px; line-height: 1.45; padding: 9px 14px; border-radius: 16px; opacity: 0; transition: .25s; pointer-events: none; text-align: center; }
+#hint.show { opacity: 1; transform: translateX(-50%); }
