@@ -7,7 +7,8 @@ import { createPlatform } from './world/platform.js';
 import { createKiosk, createTrees, createBushes, createBench, createGrass } from './world/decor.js';
 import { createBin, updateBin } from './world/bin.js';
 import { createLampPost, updatePost } from './world/lampPost.js';
-import { sim, speed, tickProjection } from './game/state.js';
+import { sim, tickProjection } from './game/state.js';
+import { advanceSim, restoreState, initPersistence, tickSave } from './game/persistence.js';
 import { createCharacter, updateCharacter } from './game/character/character.js';
 import { updateFlying, updateBottles } from './game/drinks/bottles.js';
 import { updateVomit } from './game/vomit.js';
@@ -49,17 +50,20 @@ initSheet();
 initViewport();
 tease();
 installManifest();
+const resumed = restoreState(); // après initSettings : profil et curseurs suivent la session sauvée
+initPersistence();
 
 // ---------- Boucle ----------
 const clock = new THREE.Clock();
-showHint('Sers-lui un verre, puis touche le personnage ou la voiture. Maintiens le doigt sur la pelouse pour le faire courir.', 4500);
+if (!resumed) showHint('Sers-lui un verre, puis touche le personnage ou la voiture. Maintiens le doigt sur la pelouse pour le faire courir.', 4500);
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 1 / 30);
   frame.time += dt;
-  const simSeconds = dt * speed;
-  sim.step(simSeconds / 3600);
+  // la simulation suit l'horloge murale : le temps passé onglet masqué est rattrapé
+  const simSeconds = advanceSim() * 3600;
   // [accéléré] simClock += simSeconds;
   tickProjection(dt);
+  tickSave(dt);
   const bac = sim.blood;
   updatePointer();
   updateCharacter(dt, bac);

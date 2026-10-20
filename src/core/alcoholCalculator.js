@@ -139,16 +139,16 @@ export class AlcoholSimulation {
     return { expelled, remaining: this.stomach, blood: this.blood };
   }
 
-  /** Avance la simulation de `hours` heures. */
+  /** Avance la simulation de `hours` heures, en sous-pas de 30 s (stable quelle que soit la durée). */
   step(hours) {
     let left = hours;
     while (left > 1e-9) {
       const dt = Math.min(SUBSTEP_H, left);
       this._integrate(dt);
+      this.maxBlood = Math.max(this.maxBlood, this.blood); // pic atteint même au milieu d'un long pas
       left -= dt;
     }
     this.elapsed += hours;
-    this.maxBlood = Math.max(this.maxBlood, this.blood);
   }
 
   _integrate(dt) {
