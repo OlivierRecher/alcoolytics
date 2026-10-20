@@ -85,7 +85,7 @@ function onPointerMove(e) {
   }
   if (e.buttons || e.pointerType !== 'mouse') return;
   const what = pick(e);
-  canvas.style.cursor = !what ? 'default' : what.kind === 'car' ? 'pointer' : 'grab';
+  canvas.style.cursor = !what ? 'default' : what.kind === 'car' || (what.kind === 'char' && ch.nausea > 0.5) ? 'pointer' : 'grab';
 }
 function endPointer(e) {
   const tap = down && Math.hypot(e.clientX - down.x, e.clientY - down.y) <= 8 && performance.now() - down.t <= 600 && e.type === 'pointerup';
